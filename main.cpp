@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/System.hpp>
@@ -60,16 +61,15 @@ namespace boost {
 }
 
 int main() {
+	srand(time(NULL));
 	vector<Point> points;
 	
-	for(int iPoint = 0;iPoint < 10;iPoint++) {
+	for(int iPoint = 0;iPoint < 20;iPoint++) {
 		points.push_back(Point(rand() % 800, rand() % 600));
 	}
 	
 	voronoi_diagram<double> vd;
 	construct_voronoi(points.begin(), points.end(), &vd);
-	
-	cout << vd.edges().size() << endl;
 	
 	RenderWindow window(VideoMode(800, 600), "Voronoi");
 	
@@ -102,6 +102,21 @@ int main() {
 					window.draw(segment);
 				}
 			}
+			
+			VertexArray delaunay_segment(Lines, 2);
+			
+			delaunay_segment[0].position = Vector2f(
+				points[it->cell()->source_index()].x,
+				points[it->cell()->source_index()].y
+			);
+			delaunay_segment[1].position = Vector2f(
+				points[it->twin()->cell()->source_index()].x,
+				points[it->twin()->cell()->source_index()].y
+			);
+			
+			delaunay_segment[0].color = delaunay_segment[1].color = Color(255, 0, 0);
+			
+			window.draw(delaunay_segment);
 		}
 		
 		for(Point p : points) {
