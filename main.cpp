@@ -16,34 +16,6 @@ struct Point {
 	}
 };
 
-Point operator + (const Point &a, const Point &b) {
-	return Point(a.x + b.x, a.y + b.y);
-}
-
-Point operator - (const Point &a, const Point &b) {
-	return Point(a.x - b.x, a.y - b.y);
-}
-
-Point operator * (const int &s, const Point &a) {
-	return Point(s * a.x, s * a.y);
-}
-
-double norme(const Point &a) {
-	return sqrt(a.x * a.x + a.y * a.y);
-}
-
-double dist(const Point &a, const Point &b) {
-	return norme(a - b);
-}
-
-int vect(const Point &a, const Point &b) {
-	return a.x * b.y - a.y * b.x;
-}
-
-int scal(const Point &a, const Point &b) {
-	return a.x * b.x - a.y * b.y;
-}
-
 namespace boost {
 	namespace polygon {
 		template <>
@@ -60,12 +32,25 @@ namespace boost {
 	}
 }
 
+void drawPoints(
+	vector<Point>& points,
+	RenderWindow& window
+) {
+	int radius = 5;
+	for(Point p : points) {
+		CircleShape point(radius);
+		point.setFillColor(Color(0, 0, 255));
+		point.setPosition(Vector2f(p.x - radius, p.y - radius));
+		window.draw(point);
+	}
+}
+
 int main() {
 	srand(time(NULL));
 	vector<Point> points;
 	
-	for(int iPoint = 0;iPoint < 20;iPoint++) {
-		points.push_back(Point(rand() % 800, rand() % 600));
+	for(int iPoint = 0;iPoint < 100;iPoint++) {
+		points.push_back(Point(-200 + rand() % 1200, -100 + rand() % 800));
 	}
 	
 	voronoi_diagram<double> vd;
@@ -103,6 +88,8 @@ int main() {
 				}
 			}
 			
+			drawPoints(points, window);
+			
 			VertexArray delaunay_segment(Lines, 2);
 			
 			delaunay_segment[0].position = Vector2f(
@@ -117,14 +104,6 @@ int main() {
 			delaunay_segment[0].color = delaunay_segment[1].color = Color(255, 0, 0);
 			
 			window.draw(delaunay_segment);
-		}
-		
-		for(Point p : points) {
-			VertexArray point(Points, 1);
-	
-			point[0].position = Vector2f(p.x, p.y);
-			
-			window.draw(point);
 		}
 		
 		window.display();
